@@ -3,45 +3,48 @@
 
 Research on epigenetic regulation of human spermatogenesis remains limited, particularly in understanding the epigenetic dysregulation associated with abnormal spermatogenesis. In this study, we employed high-quality scATAC-seq to investigate the epigenetic regulatory states of male germ cells during both normal spermatogenesis and its disruption in non-obstructive azoospermia (NOA) patients. We identified key transcription factors (TFs) and their target gene networks, demonstrating that their synchronized and wave-like activities are critical for driving the highly ordered progression of spermatogenesis. Additionally, we uncovered significant epigenetic changes at DNA double-strand break (DSB) hotspots, tracing their formation and repair processes at the single-cell level. We showed that a male germ cell set up open chromatin state for several thousands of DSB hotspots. Of these, several hundreds go on to forms DSBs and finally several dozens of these DSBs forms crossovers, permitting proper exchange of genetic materials between parental alleles through homologous recombination. In NOA patients, spermatogenesis is arrested at the zygotene stage with many master TFs showing aberrant dephasing and decoupling. These regulatory failures hinder the spermatogenesis from progressing to the next developmental stage properly. Additionally, we identified point mutations as genetic basis for the dysregulation of TF motif activation such as for NFYB-PITX2-HMGA1 axis. Abnormal DSB hotspot dynamics were also revealed in NOA patients, with approximately half of the opened DSB hotspots in each cell lost accessibility compared to normal spermatogenesis, contributing to a 2-3 fold increase in aneuploid sperm cells. Our findings provide a deeper view of key gene regulatory mechanisms underlying human spermatogenesis and offers new perspectives on the pathogenesis of NOA.
 
+## Scripts
+
+> *01.preprocessing_pipeline.java*
+
+This is a Nextflow script designed for performing essential quality control and alignment of raw scATAC-seq data, ultimately generating fragments files.
+
+> *02.OA_ArchR_pip.R*
+
+We utilized samples from OA patients to construct a chromatin accessibility atlas for normal spermatogenesis. The fragments files generated in the previous step were used as input for ArchR to perform the following analyses: **quality control**, **cell clustering**, **visualization**, **peak calling**, **GeneScore calculation**, **differential GeneScore analysis**, **differential accessibility peak (DAP) analysis**, **enrichment analysis**, **TF motif activity analysis**, and **trajectory analysis**. These analyses correspond to the relevant content in Figures 1 and 2.
+
+> *03.OA_NOA_ArchR_pip.R*
+
+Similar to the script `02.OA_ArchR_pip.R`, this analysis incorporates cells from NOA samples, and the cell types of NOA samples are inferred and identified based on the labels from OA samples.
+
+> *04.Joint_scRNA-seq_and_scATAC-seq_analysis.R*
+
+Integrated analysis and visualization of scATAC-seq and scRNA-seq data were performed on OA samples.
+
+> *05.Pando_analysis.R*
+
+Pando was used to construct the transcription factor (TF) regulatory network, and the network was pruned as needed to generate the `ALL_network_positive_negative.csv` file.
+
+> *06.DSB_hotspots.R*
+
+Human DMC1 ChIP data was overlapped with chromatin accessible regions of L and Z-stage spermatocytes to generate the `LZ_DMC1.bed` file. The cell-peak binary matrix was extracted, and peaks and cell IDs to be retained were filtered for heatmap visualization. DNA double-strand break (DSB) hotspots were grouped into four clusters, followed by enrichment analysis.
+
+> *07.Identification_of_sperm_aneuploidy.R*
+
+CNV (copy number variation) was calculated for each cell type using a 5Mb window with OA samples as controls, excluding the hg19 blacklist regions. Each cell type had its own corresponding control group.
+
+> *08.NOA_call_snv.R*
+
+The OA data was used to construct the control file `OA_pon.vcf.gz`. Mutect2 was then used to calculate SNVs (single nucleotide variants) for single cells and merged SNVs from all cells of each patient. Finally, only SNVs supported by three or more cells and with a population frequency below 0.001 were retained.
+
+> *09.LD_score_regression.sh*
+
+Statistical significance and linkage disequilibrium information from GWAS data were used to infer the association between genetic variants and cell types.
+
+> *10.Chromafold.sh*
+
+Chromafold was employed to predict the Hi-C structure of normal spermatocytes during the Z stage.
 
 
 
----
-title: Start with a present participle
-shortTitle: <subject> # Max 31 characters
-intro: 'Article intro. See tips for a great intro below.'
-product: "{{ optional product callout }}"
-type: how_to
-topics:
-  - <topic> # One or more from list of allowed topics: https://github.com/github/docs/blob/main/data/allowed-topics.js
-versions:
-  - <version>
----
 
-
-Follow the guidelines in https://docs.github.com/contributing/writing-for-github-docs/content-model#procedural to write this article.-- >
-Great intros give readers a quick understanding of what's in the article, so they can tell whether it's relevant to them before moving ahead. For more tips, see https://docs.github.com/contributing/writing-for-github-docs/content-model
-For product callout info, see https://github.com/github/docs/tree/main/content#product
-For product version instructions, see https://github.com/github/docs/tree/main/content#versioning
-Remove these comments from your article file when you're done writing
-
-
-## Procedural section header here
-
-
-Include prerequisite information or specific permissions information here.
-Then write procedural steps following the instructions in https://docs.github.com/contributing/style-guide-and-content-model/style-guide#procedural-steps.
-Check if there's already a reusable string for the step you want to write in https://github.com/github/docs/tree/main/data/reusables. Look at the source file for a procedure located in the same area of the user interface to find reusables.
-
-
-## Introduction 
-
-
-
-## Further reading
-
-
-Optionally, include a bulleted list of related articles the user can reference to extend the concepts covered in this article. Consider linking to procedural articles or tutorials that help the user use the information in your article.
-
-
-- "[Article title](article-URL)"
