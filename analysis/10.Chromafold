@@ -1,0 +1,112 @@
+
+##########Extract all fragments at the Z stage##########
+
+ mkdir Z_fra
+ python software/ChromaFold/ChromaFold-main/preprocessing_pipeline/fragment_celltype_merge.py \
+   --cell_type Z \
+   --fragment_list ./OA_NOA_fragments/OA1.fragments.tsv.gz \
+   ./OA_NOA_fragments/OA2.fragments.tsv.gz \
+   ./OA_NOA_fragments/OA3.fragments.tsv.gz \
+   ./OA_NOA_fragments/OA4.fragments.tsv.gz \
+   ./OA_NOA_fragments/OA5.fragments.tsv.gz \
+   ./OA_NOA_fragments/OA6.fragments.tsv.gz \
+   ./OA_NOA_fragments/OA7.fragments.tsv.gz \
+   ./OA_NOA_fragments/OA8.fragments.tsv.gz \
+   ./OA_NOA_fragments/OA9.fragments.tsv.gz \
+   ./OA_NOA_fragments/OA10.fragments.tsv.gz \
+   ./OA_NOA_fragments/OA11.fragments.tsv.gz \
+   ./OA_NOA_fragments/OA12.fragments.tsv.gz \
+   ./OA_NOA_fragments/OA13.fragments.tsv.gz \
+   ./OA_NOA_fragments/OA14.fragments.tsv.gz \
+   ./OA_NOA_fragments/OA15.fragments.tsv.gz \
+   ./OA_NOA_fragments/OA16.fragments.tsv.gz \
+ 
+   --data_prefix_list "OA1" \
+    "OA2" \
+    "OA3" \
+    "OA4" \
+    "OA5" \
+    "OA6" \
+    "OA7" \
+    "OA8" \
+    "OA9" \
+    "OA10" \
+    "OA11" \
+    "OA12" \
+    "OA13" \
+    "OA14" \
+    "OA15" \
+    "OA16" \
+    --save_name ./Z_fra/Z_selected_fragments.tsv.gz \
+    --cell_type_file ./cell_type_file.csv \
+    --genome_assembly hg19
+
+
+##########Use Chromafold to predict the Hi-C of chr6##########
+
+SAVE_LOC="/gpfs1/tangfuchou_pkuhpc/tangfuchou_cls/xiehaoling/Sperm_atac/Chromafold/Z_result"
+DATA_PREFIX="Z_selected_fragments"
+FRAG_LOC="/gpfs1/tangfuchou_pkuhpc/tangfuchou_cls/xiehaoling/Sperm_atac/Chromafold/Z_fra/"
+FRAG_FILE_PREFIX="${DATA_PREFIX}"
+GENOME_ASSEMBLY="hg19"
+  
+mkdir -p Z_result
+mkdir -p ./archr_data_Z/"${DATA_PREFIX}"
+ARCHR_LOC=/gpfs1/tangfuchou_pkuhpc/tangfuchou_cls/xiehaoling/Sperm_atac/Chromafold/archr_data_Z/"${DATA_PREFIX}"
+  
+
+gunzip -c "${FRAG_LOC}"/"${FRAG_FILE_PREFIX}.tsv.gz" | /lustre2/tangfuchou_pkuhpc/tangfuchou_cls/xiehaoling/software/anaconda3/envs/lustre2_ISOseq/bin/bgzip  > "${FRAG_LOC}"/"${FRAG_FILE_PREFIX}_bgz.tsv.gz"
+sortBed -i "${FRAG_LOC}"/"${FRAG_FILE_PREFIX}_bgz.tsv.gz" > "${FRAG_LOC}"/"${FRAG_FILE_PREFIX}_bgz_sorted.tsv"
+
+htsfile "${FRAG_LOC}"/"${FRAG_FILE_PREFIX}_bgz_sorted.tsv"
+bgzip "${FRAG_LOC}"/"${FRAG_FILE_PREFIX}_bgz_sorted.tsv"
+ 
+rm "${FRAG_LOC}"/"${FRAG_FILE_PREFIX}_bgz_sorted.tsv.gz.tbi" # remove previously calculated .tbi file
+rm "${FRAG_LOC}"/"${FRAG_FILE_PREFIX}_bgz.tsv.gz" # remove intermediate files
+
+
+cd "${SAVE_LOC}"
+mkdir -p atac
+mkdir -p dna
+mkdir -p predictions
+mkdir -p assembly
+
+cp software/Chromafold/L1_result/dna/hg19_ctcf_motif_score.p     ./dna/hg19_ctcf_motif_score.p
+cp software/Chromafold/L1_result/assembly/hg19.chrom.sizes ./assembly/hg19.chrom.sizes
+
+cd ../
+
+Rscript software/ChromaFold/ChromaFold-main/preprocessing_pipeline/ArchR_preparation.R \
+  "${DATA_PREFIX}" \
+  "${ARCHR_LOC}" \
+  "${FRAG_LOC}"/"${FRAG_FILE_PREFIX}_bgz_sorted.tsv.gz" \
+  "${GENOME_ASSEMBLY}"
+
+python software/ChromaFold/ChromaFold-main/preprocessing_pipeline/scATAC_preparation.py \
+   --cell_type_prefix "${DATA_PREFIX}" \
+   --fragment_file  "${FRAG_LOC}"/"${FRAG_FILE_PREFIX}_bgz_sorted.tsv.gz" \
+   --barcode_file "${ARCHR_LOC}"/archr_filtered_barcode.csv \
+   --lsi_file "${ARCHR_LOC}"/archr_filtered_lsi.csv \
+   --genome_assembly "${GENOME_ASSEMBLY}" \
+   --save_path "${SAVE_LOC}"
+
+SAVE_LOC="/gpfs1/tangfuchou_pkuhpc/tangfuchou_cls/xiehaoling/Sperm_atac/Chromafold/Z_result"
+DATA_PREFIX="$1_selected_fragments"
+
+python software/ChromaFold/ChromaFold-main/chromafold/inference.py --data-path "${SAVE_LOC}"\
+  -ct "${DATA_PREFIX}"\
+  --model-path software/ChromaFold/ChromaFold-main/checkpoints/chromafold_CTCFmotif.pth.tar\
+  --save-path /gpfs1/tangfuchou_pkuhpc/tangfuchou_cls/xiehaoling/Sperm_atac/Chromafold/Z_result/predictions\
+  -chrom 6\
+  --disable-cuda \
+  -offset 0\
+  --genome hg19
+
+
+
+
+
+
+
+
+
