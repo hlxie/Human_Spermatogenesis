@@ -1,5 +1,5 @@
 
-##########Extract all fragments at the Z stage##########
+###    Extract all fragments at the Z stage    ###
 
  mkdir Z_fra
  python software/ChromaFold/ChromaFold-main/preprocessing_pipeline/fragment_celltype_merge.py \
@@ -42,7 +42,7 @@
     --genome_assembly hg19
 
 
-##########Use Chromafold to predict the Hi-C of chr6##########
+###    Use Chromafold to predict the Hi-C of chr6    ###
 
 SAVE_LOC="/gpfs1/tangfuchou_pkuhpc/tangfuchou_cls/xiehaoling/Sperm_atac/Chromafold/Z_result"
 DATA_PREFIX="Z_selected_fragments"
