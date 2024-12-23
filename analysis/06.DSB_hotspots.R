@@ -3,23 +3,23 @@ library(Seurat)
 set.seed(1)
 
 projHeme6=readRDS("/date/xiehaoling/Sperm_atac/OA/Save-OA-ArchR-Project.rds")
-LZ_PRDM9_Overlap_peak=read.table("LZ_PRDM9.bed") #The LZ_PRDM9.bed file is an intersection file of DMC1 chip data and the open peaks during the L and Z stages of normal spermatogenesis
+LZ_DMC1_Overlap_peak=read.table("LZ_DMC1.bed") #The LZ_DMC1.bed file is an intersection file of DMC1 chip data and the open peaks during the L and Z stages of normal spermatogenesis
 
 
 PeakMatrix=getMatrixFromProject(projHeme6,useMatrix = "PeakMatrix",binarize = T)
 Use_cell=row.names(projHeme6@cellColData[projHeme6@cellColData$Cell_type=="L"| projHeme6@cellColData$Cell_type=="Z",])
 
 PeakMatrix@rowRanges$ID=seq(1:647124)
-row_ID=PeakMatrix@rowRanges[PeakMatrix@rowRanges %over% LZ_PRDM9_Overlap_peak]$ID
-Use_peak=PeakMatrix@rowRanges[PeakMatrix@rowRanges %over% LZ_PRDM9_Overlap_peak]
+row_ID=PeakMatrix@rowRanges[PeakMatrix@rowRanges %over% LZ_DMC1_Overlap_peak]$ID
+Use_peak=PeakMatrix@rowRanges[PeakMatrix@rowRanges %over% LZ_DMC1_Overlap_peak]
 Use_peak_name=paste(Use_peak@seqnames,as.data.frame(ranges(Use_peak))$start,as.data.frame(ranges(Use_peak))$end,sep = "_")
-PeakMatrix_PRDM9_AA_union=as.matrix(PeakMatrix@assays@data$PeakMatrix[row_ID,Use_cell])
-row.names(PeakMatrix_PRDM9_AA_union)=Use_peak_name
+PeakMatrix_DMC1_AA_union=as.matrix(PeakMatrix@assays@data$PeakMatrix[row_ID,Use_cell])
+row.names(PeakMatrix_DMC1_AA_union)=Use_peak_name
 
 
 DF=as.data.frame(as.matrix(PeakMatrix@assays@data$PeakMatrix[row_ID,row.names(projHeme6@cellColData)]))
 row.names(DF)=Use_peak_name
-write.table(row.names(DF),"PRDM9_peak.bed",quote = F,row.names = F,sep="\t")
+write.table(row.names(DF),"DMC1_peak.bed",quote = F,row.names = F,sep="\t")
 
 
 
@@ -29,15 +29,15 @@ library(ChIPseeker)
 library(TxDb.Hsapiens.UCSC.hg19.knownGene)
 txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
 
-PRDM9_peak=readPeakFile("PRDM9_peak.bed")
-peakAnno <- annotatePeak(PRDM9_peak, tssRegion=c(-3000, 1000), TxDb=txdb,annoDb="org.Hs.eg.db")
+DMC1_peak=readPeakFile("DMC1_peak.bed")
+peakAnno <- annotatePeak(DMC1_peak, tssRegion=c(-3000, 1000), TxDb=txdb,annoDb="org.Hs.eg.db")
 write.csv(as.data.frame(peakAnno@anno[abs(peakAnno@anno$distanceToTSS)>2000,])[,c("seqnames","start","end")],
-                            "PRDM9_used_peak_tss_2K.bed",row.names=F,quote=F)
+                            "DMC1_used_peak_tss_2K.bed",row.names=F,quote=F)
 
 
 
 ###Trajectory  analysis
-Finally_used_peak=read.table("/date/xiehaoling/Sperm_atac/OA_Y/Save-OA_cell/PRDM9_used_peak_tss_2K.bed")
+Finally_used_peak=read.table("/date/xiehaoling/Sperm_atac/OA_Y/Save-OA_cell/DMC1_used_peak_tss_2K.bed")
 DF_used=DF[as.character(Finally_used_peak$V1),]
 
 DSB <- c("PreL","L", "Z","PreP")
@@ -95,7 +95,7 @@ ann.color <- list(Sample = setNames(ArchRPalettes$stallion[1:length(levels(Row_a
                         cutree_rows=4,
                         color = paletteContinuous(set = "whiteRed", n = 100,reverse = FALSE))
 
-ggsave("/date/xiehaoling/Sperm_atac/OA/PRDM9/heatmap_ALL_cell/L_Z_test_4_20_2K.png",p,width = 10, height = 13, dpi = 300)
+ggsave("/date/xiehaoling/Sperm_atac/OA/DMC1/heatmap_ALL_cell/L_Z_test_4_20_2K.png",p,width = 10, height = 13, dpi = 300)
 
 row_cluster <- as.data.frame(cutree(p$tree_row,k=4))
 write.csv(row_cluster,"L_Z_pheatmap_row_cluster_4_2K.csv")
@@ -105,10 +105,10 @@ library("LOLA")
 dbPath = system.file("extdata", "hg19", package="LOLA")
 regionDB = loadRegionDB(dbPath)
 
-peak_cluster1 <- readPeakFile("PRDM9_peak_cluster_A_2K.bed")
-peak_cluster2 <- readPeakFile("PRDM9_peak_cluster_B_2K.bed")
-peak_cluster3 <- readPeakFile("PRDM9_peak_cluster_C_2K.bed")
-peak_cluster4 <- readPeakFile("PRDM9_peak_cluster_D_2K.bed")
+peak_cluster1 <- readPeakFile("DMC1_peak_cluster_A_2K.bed")
+peak_cluster2 <- readPeakFile("DMC1_peak_cluster_B_2K.bed")
+peak_cluster3 <- readPeakFile("DMC1_peak_cluster_C_2K.bed")
+peak_cluster4 <- readPeakFile("DMC1_peak_cluster_D_2K.bed")
 userUniverse <- readPeakFile("All_bg_Markers_peak.bed")
 
 locResults = runLOLA(peak_cluster1, userUniverse, regionDB, cores=1)  # peak_cluster2,peak_cluster3,peak_cluster4
