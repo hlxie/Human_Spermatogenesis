@@ -15,27 +15,27 @@ We utilized samples from OA patients to construct a chromatin accessibility atla
 
 > *03.OA_NOA_ArchR_pip.R*
 
-Similar to the script `02.OA_ArchR_pip.R`, this analysis incorporates cells from NOA samples, and the cell types of NOA samples are inferred and identified based on the labels from OA samples.
+Similar to the script `02.OA_ArchR_pip.R`, this analysis incorporates cells from NOA samples, and the cell types of NOA samples are inferred and identified based on the labels from OA samples.These analyses correspond to the relevant content in **Figures 4 and 5**.
 
 > *04.Joint_scRNA-seq_and_scATAC-seq_analysis.R*
 
-Integrated analysis and visualization of scATAC-seq and scRNA-seq data were performed on OA samples.
+Integrated analysis and visualization of scATAC-seq and scRNA-seq data were performed on OA samples. These analyses correspond to the relevant content in **Figures 2**.
 
 > *05.Pando_analysis.R*
 
-Pando was used to construct the transcription factor (TF) regulatory network, and the network was pruned as needed to generate the `ALL_network_positive_negative.csv` file.
+Pando was used to construct the transcription factor (TF) regulatory network, and the network was pruned as needed to generate the `ALL_network_positive_negative.csv` file. These analyses correspond to the relevant content in **Figures 2**.
 
 > *06.DSB_hotspots.R*
 
-Human DMC1 ChIP data was overlapped with chromatin accessible regions of L and Z-stage spermatocytes to generate the `LZ_DMC1.bed` file. The cell-peak binary matrix was extracted, and peaks and cell IDs to be retained were filtered for heatmap visualization. DNA double-strand break (DSB) hotspots were grouped into four clusters, followed by enrichment analysis.
+Human DMC1 ChIP data was overlapped with chromatin accessible regions of L and Z-stage spermatocytes to generate the `LZ_DMC1.bed` file. The cell-peak binary matrix was extracted, and peaks and cell IDs to be retained were filtered for heatmap visualization. DNA double-strand break (DSB) hotspots were grouped into four clusters, followed by enrichment analysis. These analyses correspond to the relevant content in **Figures 3**.
 
 > *07.Identification_of_sperm_aneuploidy.R*
 
-CNV (copy number variation) was calculated for each cell type using a 5Mb window with OA samples as controls, excluding the hg19 blacklist regions. Each cell type had its own corresponding control group.
+CNV (copy number variation) was calculated for each cell type using a 5Mb window with OA samples as controls, excluding the hg19 blacklist regions. Each cell type had its own corresponding control group. These analyses correspond to the relevant content in **Figures 6**.
 
 > *08.NOA_call_snv.R*
 
-The OA data was used to construct the control file `OA_pon.vcf.gz`. Mutect2 was then used to calculate SNVs (single nucleotide variants) for single cells and merged SNVs from all cells of each patient. Finally, only SNVs supported by three or more cells and with a population frequency below 0.001 were retained.
+The OA data was used to construct the control file `OA_pon.vcf.gz`. Mutect2 was then used to calculate SNVs (single nucleotide variants) for single cells and merged SNVs from all cells of each patient. Finally, only SNVs supported by three or more cells and with a population frequency below 0.001 were retained. These analyses correspond to the relevant content in **Figures 7**.
 
 > *09.LD_score_regression.sh*
 
@@ -43,7 +43,7 @@ Statistical significance and linkage disequilibrium information from GWAS data w
 
 > *10.Chromafold.sh*
 
-Chromafold was employed to predict the Hi-C structure of normal spermatocytes during the Z stage.
+Chromafold was employed to predict the Hi-C structure of normal spermatocytes during the Z stage. These analyses correspond to the relevant content in **Figures 7**.
 
 
 
