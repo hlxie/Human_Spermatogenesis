@@ -8,8 +8,8 @@ addArchRThreads(threads = 10)
 ArrowFiles <- createArrowFiles(
                 inputFiles = inputFiles,
                 sampleNames = names(inputFiles),
-                filterTSS = 4, #Dont set this too high because you can always increase later
-                                excludeChr = c("chrM"),
+                filterTSS = 4, 
+                excludeChr = c("chrM"),
                 filterFrags = 10000,
                 maxFrags = 1000000000,
                 addTileMat = TRUE,
@@ -92,7 +92,7 @@ OA_projHeme <- addPeakMatrix( projHeme2)
 OA_projHeme <- addIterativeLSI(
                                 ArchRProj = OA_projHeme,
                                 force = TRUE,
-                                sampleCellsPre = 10000,#迭代使用细胞数
+                                sampleCellsPre = 10000,
                                 useMatrix = "PeakMatrix",
                                 name = "IterativeLSI",
                                 iterations = 3,
